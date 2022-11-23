@@ -188,7 +188,7 @@ public class Board {
         }
         createMineTXT();
         for (int j = 0; j < allCells; j++) {
-            Tile tile = new Tile(j, field[j]);
+            Tile tile = new Tile(j, field[j], this);
             boardPane.getChildren().add(tile);
 
             System.out.print(field[j] + " ");
@@ -498,7 +498,7 @@ public class Board {
             }
             uncoverCells = 0;
             for (int j = 0; j < N_ROWS * N_COLS; j++) {
-                Tile newtile = new Tile(j, field[j]);
+                Tile newtile = new Tile(j, field[j], this);
                 int as = returnImageNumber(newtile);
                 newtile.paintingTile(as);
                 boardPane.getChildren().add(newtile);
@@ -516,7 +516,7 @@ public class Board {
             }
 
             if (!inGame) {
-                Alert alert = new Alert(AlertType.WARNING, "Yoy Lose🤨. Again  ?",
+                Alert alert = new Alert(AlertType.WARNING, "Yoy Lose :( . Again  ?",
                         ButtonType.YES,
                         ButtonType.NO);
                 alert.showAndWait();
@@ -531,39 +531,4 @@ public class Board {
         }
     }
 
-    private class Tile extends StackPane {
-        private int columnTile, rowTile, value, position;
-
-        private Rectangle border = new Rectangle(CELL_SIZE, CELL_SIZE);
-        private Text text = new Text();
-
-        public Tile(int position, int value) {
-            this.position = position;
-            columnTile = position % N_COLS;
-            rowTile = (position - columnTile) / N_ROWS;
-            this.value = value;
-
-            border.setStroke(Color.LIGHTGRAY);
-
-            border.setFill(new ImagePattern(img[10]));
-            text.setFont(Font.font(15));
-            text.setText(Integer.toString(value));
-            text.setVisible(false);
-            getChildren().addAll(border, text);
-
-            setTranslateX(columnTile * CELL_SIZE);
-            setTranslateY(rowTile * CELL_SIZE);
-
-            setOnMouseClicked(e -> open(e, this.position));
-        }
-
-        public void open(javafx.scene.input.MouseEvent ee, int position) {
-            mousePressed(position, ee, this);
-        }
-
-        public void paintingTile(int numberImg) {
-            border.setFill(new ImagePattern(img[numberImg]));
-        }
-
-    }
 }
