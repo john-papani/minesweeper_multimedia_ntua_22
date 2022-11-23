@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.module.InvalidModuleDescriptorException;
 import java.util.List;
+import java.util.logging.Handler;
 
 import javax.swing.Action;
 import javax.swing.JFrame;
@@ -27,9 +28,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -53,7 +56,7 @@ class InvalidValueException extends Exception {
     }
 }
 
-public class Minesweeper extends JFrame {
+public class Minesweeper extends Application {
     public static int difficulty;
     public static int numMines;
     public static int max_time;
@@ -68,11 +71,32 @@ public class Minesweeper extends JFrame {
     private static int MIN_MINES_HARD = 35;
     private static int MAX_MINES_HARD = 45;
 
-    private JLabel statusbar;
+    private Scene scene;
 
-    public Minesweeper() {
+    public Parent Minesweeper1(Stage stage) {
+        BorderPane rootPane = new BorderPane();
+        Pane pane1 = new Pane();
 
-        initUI();
+        Label labelTop = new Label("HERE WILL BE THE PLAY AND START BOTTOMS");
+        HBox hBoxTop = new HBox();
+        HBox.setMargin(labelTop, new Insets(20, 20, 20, 20));
+        hBoxTop.getChildren().add(labelTop);
+
+        Label labelBottom = new Label("NUMBER OF BOMBS");
+        HBox hBoxBottom = new HBox();
+        HBox.setMargin(labelBottom, new Insets(20, 20, 20, 20));
+        hBoxBottom.getChildren().add(labelBottom);
+
+        labelTop.setStyle("-fx-font-weight: bold");
+        labelBottom.setStyle("-fx-font-weight: bold");
+
+        Board board = new Board(pane1, labelBottom, stage);
+
+        rootPane.setTop(hBoxTop);
+        rootPane.setCenter(pane1);
+        rootPane.setBottom(hBoxBottom);
+
+        return rootPane;
     }
 
     public static void readScenarioFile() throws Exception {
@@ -118,29 +142,22 @@ public class Minesweeper extends JFrame {
         }
     }
 
-    private void initUI() {
-
-        statusbar = new JLabel("");
-        add(statusbar, BorderLayout.SOUTH);
-
-        add(new Board(statusbar));
-
-        setResizable(false);
-        pack();
-
-        setTitle("Narkalietis");
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public static void main(String[] args) throws Exception {
+        // readScenarioFile();
+        launch(args);
     }
 
-    public static void main(String[] args) {
+    @Override
+    public void start(Stage stage) throws Exception {
+        scene = new Scene(Minesweeper1(stage));
 
-        EventQueue.invokeLater(() -> {
+        stage.setTitle("My Minesweeper_ioannis-papani_multimedia_2022");
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.show();
 
-            var ex = new Minesweeper();
-            ex.setVisible(true);
-        });
     }
+
 }
 
 // public class Minesweeper {
@@ -152,69 +169,57 @@ public class Minesweeper extends JFrame {
 // BorderPane bPane = new BorderPane();
 // Scene scene = new Scene(bPane, 400, 400);
 
-// // Board Boardd = new Board(statusBar,bPane);
-// // // Boardd.N_COLS = 15;
-// // // Boardd.N_ROWS = 15;
-// // // Boardd.N_MINES = 3;
-// // // bPane.setBottom(Boardd);
+// Board Boardd = new Board(statusBar,bPane);
+// // Boardd.N_COLS = 15;
+// // Boardd.N_ROWS = 15;
+// // Boardd.N_MINES = 3;
+// // bPane.setBottom(Boardd);
 
-// // }
-
-// public static void main(String[] args) {
-// startGame();
-// // launch(args);
 // }
 
-// // @Override
-// // public void start(Stage stage) {
-// // Label mainGameHere = new Label("epp kaleeeppp kalispera, edo tha mpei to
-// // game");
-// // Button playEasyButton = new Button("Play Easy");
-// // Button playHardButton = new Button("Play Hard");
+// @Override
+// public void start(Stage stage) {ψ
+// Label mainGameHere = new Label("epp kaleeeppp kalispera, edo tha mpei to
+// game");
+// Button playEasyButton = new Button("Play Easy");
+// Button playHardButton = new Button("Play Hard");
 
-// // playEasyButton.setOnAction(this::clicledButton);
-// // playHardButton.setOnAction(this::clicledhardButton);
+// playEasyButton.setOnAction(this::clicledButton);
+// playHardButton.setOnAction(this::clicledhardButton);
 
-// // HBox hBox = new HBox();
-// // hBox.setSpacing(10);
+// HBox hBox = new HBox();
+// hBox.setSpacing(10);
 
-// // HBox.setMargin(playEasyButton, new Insets(20, 20, 20, 20));
-// // HBox.setMargin(playHardButton, new Insets(20, 20, 20, 20));
+// HBox.setMargin(playEasyButton, new Insets(20, 20, 20, 20));
+// HBox.setMargin(playHardButton, new Insets(20, 20, 20, 20));
 
-// // ObservableList list = hBox.getChildren();
-// // list.addAll(playEasyButton, playHardButton);
+// ObservableList list = hBox.getChildren();
+// list.addAll(playEasyButton, playHardButton);
 
-// // statusBar.setStyle("-fx-font-weight: bold");
+// statusBar.setStyle("-fx-font-weight: bold");
 
-// // bPane.setTop(hBox);
-// // bPane.setCenter(mainGameHere);
-// // // bPane.setBottom(statusBar);
-// // BorderPane.setMargin(hBox, new Insets(10, 20, 10, 80));
-// // BorderPane.setMargin(mainGameHere, new Insets(20, 20, 20, 20));
-// // BorderPane.setMargin(statusBar, new Insets(20, 20, 5, 5));
+// bPane.setTop(hBox);
+// bPane.setCenter(mainGameHere);
+// // bPane.setBottom(statusBar);
+// BorderPane.setMargin(hBox, new Insets(10, 20, 10, 80));
+// BorderPane.setMargin(mainGameHere, new Insets(20, 20, 20, 20));
+// BorderPane.setMargin(statusBar, new Insets(20, 20, 5, 5));
 
-// // // BorderPane.setAlignment(hBox, Pos.BOTTOM_LEFT);
+// // BorderPane.setAlignment(hBox, Pos.BOTTOM_LEFT);
 
-// // stage.setTitle("O Narkalieutis Mou");
-// // stage.setScene(scene);
+// stage.setTitle("O Narkalieutis Mou");
+// stage.setScene(scene);
 
-// // initUI();
+// initUI();
 
-// // stage.show();
+// stage.show();
 
-// // }
+// }
 
-// // private void clicledButton(ActionEvent e) {
-// // statusBar.setText("YESSS WE DID IT");
-// // }
+// private void clicledButton(ActionEvent e) {
+// statusBar.setText("YESSS WE DID IT");
+// }
 
-// // private void clicledhardButton(ActionEvent e) {
-// // statusBar.setText("hard nowwwwwwwwwwwwwwwww");
-// // }
-
-// // // public static void main(String[] args) throws Exception {
-// // // // readScenarioFile();
-// // // // startGame();
-// // // testingFx(null);
-
-// // // }
+// private void clicledhardButton(ActionEvent e) {
+// statusBar.setText("hard nowwwwwwwwwwwwwwwww");
+// }

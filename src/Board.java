@@ -1,37 +1,33 @@
 //! https://zetcode.com/javagames/minesweeper/
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.ImageObserver;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import javafx.application.Application;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.image.Image;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import javafx.scene.input.MouseEvent;
 
-public class Board extends JLabel {
+public class Board {
 
     private final int NUM_IMAGES = 16;
-    private final int CELL_SIZE = 15;
+    public final int CELL_SIZE = 30;
 
     private final int COVER_FOR_CELL = 10;
     private final int FOR_FLAG = 10;
@@ -53,99 +49,48 @@ public class Board extends JLabel {
     private final int DRAW_SUPERBOMB = 14;
     private final int DRAW_FLAG_SUPERBOMB = 15;
 
-    private final int N_MINES = 35;
-    private final int N_ROWS = 15;
-    private final int N_COLS = 15;
+    public final int N_MINES = 5;
+    public final int N_ROWS = 15;
+    public final int N_COLS = 15;
 
-    private final int BOARD_WIDTH = N_COLS * CELL_SIZE + 5;
-    private final int BOARD_HEIGHT = N_ROWS * CELL_SIZE + 5;
+    private final int BOARD_WIDTH = N_COLS * CELL_SIZE + 10;
+    private final int BOARD_HEIGHT = N_ROWS * CELL_SIZE + 10;
 
     private int[] field;
     private boolean inGame;
     private boolean flagSuperBomb = false;
     private int flags;
-    private Image[] img;
+    public Image[] img;
 
     private int successfulClicks = 0;
 
     private int allCells;
-    // private final Label statusBar;
-
-    // // private final Canvas canvas;
-    // // private final Pane boardPane;
-    private final JLabel statusbar;
     private String fileForMineTXT = "";
+    private final Label statusbar;
+    private Stage wholeStage;
+    private Pane boardPane;
+    private int uncoverCells;
 
-    public Board(JLabel statusbar) {
-        this.statusbar = statusbar;
+    public Board(Pane bPane, Label lableBottom, Stage stage) {
+        boardPane = bPane;
+        statusbar = lableBottom;
+        wholeStage = stage;
         initBoard();
     }
-
-    // public Board(Label statusBar, BorderPane bPane) {
-    // canvas = new Canvas(BOARD_WIDTH, BOARD_HEIGHT);
-    // this.statusBar = statusBar;
-    // bPane.setBottom(canvas);
-    // boardPane = bPane;
-    // initBoard();
-    // }
 
     private void loadImages() {
         img = new Image[NUM_IMAGES];
         for (int i = 0; i < NUM_IMAGES; i++) {
-            var path = "src/img/" + i + ".png";
-            img[i] = (new ImageIcon(path)).getImage();
+            var path = "./img/" + i + ".png";
+            img[i] = new Image(path);
         }
-
     }
 
-    // private void loadImages() {
-    // Image[] img = new Image[NUM_IMAGES];
-    // for (int i = 0; i < NUM_IMAGES; i++) {
-    // var path = "src/img/" + i + ".png";
-    // try {
-    // img[i] = ImageIO.read(new FileInputStream(path));
-    // } catch (IOException e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // }
-    // }
-    // }
-
-    public void initBoard() {
-
-        setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
+    private void initBoard() {
+        boardPane.setPrefSize(BOARD_WIDTH, BOARD_HEIGHT);
         loadImages();
-        // canvas.setOnMouseClicked(mousePressed());
-        addMouseListener(new MinesAdapter());
         newGame();
-        // createBoard();
     }
-
-    // private void createBoard() {
-    // // boardPane.getChildren().clear();
-    // boardPane.getHeight();
-    // for (int y = 0; y < canvas.getHeight(); y++) {
-    // for (int x = 0; x < canvas.getWidth(); x++) {
-    // Pane tilePane = new Pane();
-
-    // tilePane.setTranslateX(x * CELL_SIZE);
-    // tilePane.setTranslateY(y * CELL_SIZE);
-    // tilePane.setPrefWidth(CELL_SIZE);
-    // tilePane.setPrefHeight(CELL_SIZE);
-    // tilePane.getProperties().put("x", x);
-    // tilePane.getProperties().put("y", y);
-    // // tilePane.setOnMouseClicked(e -> mousePressed(e));
-
-    // ImageView tileImageView = new ImageView(img[0].toString());
-    // tilePane.getChildren().add(tileImageView);
-
-    // tilePane.setStyle("-fx-border-color: grey; -fx-border-width: 2px;
-    // -fx-background-color: lightgray;");
-
-    // boardPane.getChildren().add(tilePane);
-    // }
-    // }
-    // }
 
     private void createMineTXT() {
 
@@ -174,7 +119,6 @@ public class Board extends JLabel {
         field = new int[allCells];
 
         for (int i = 0; i < allCells; i++) {
-
             field[i] = COVER_FOR_CELL;
         }
 
@@ -244,6 +188,9 @@ public class Board extends JLabel {
         }
         createMineTXT();
         for (int j = 0; j < allCells; j++) {
+            Tile tile = new Tile(j, field[j]);
+            boardPane.getChildren().add(tile);
+
             System.out.print(field[j] + " ");
             if ((j + 1) % 15 == 0)
                 System.out.print("\n");
@@ -410,194 +357,212 @@ public class Board extends JLabel {
         open_right(j);
     }
 
-    @Override
-    public void paintComponent(Graphics g) {
+    public int returnImageNumber(Tile tile) {
+        int cell = tile.value;
 
-        int uncover = 0;
+        if (inGame && cell == MINE_CELL) {
+            inGame = false;
+        }
+        if (!inGame) {
+            if (cell == COVERED_MINE_CELL) {
+                cell = DRAW_MINE;
+            } else if (cell == FLAGGED_MINE_CELL || cell == FLAGGED_SUPER_BOMB) {
+                cell = DRAW_FLAG;
+            } else if (cell == COVERED_SUPER_BOMB_CELL) {
+                cell = DRAW_SUPERBOMB;
+                // } else if (cell == SUPER_BOMB_CELL) {
+                // cell = DRAW_SUPERBOMB;
+            } else if (cell == MINE_COL_LINE_OFSUPER) {
+                cell = DRAW_MINE_SUPERBOMB_LINE_COL;
+            } else if (cell > COVERED_MINE_CELL) {
+                cell = DRAW_WRONG_FLAG;
+            } else if (cell > MINE_CELL) {
+                cell = DRAW_COVER;
+            }
+        } else {
 
-        for (int i = 0; i < N_ROWS; i++) {
-
-            for (int j = 0; j < N_COLS; j++) {
-
-                int cell = field[(i * N_COLS) + j];
-
-                if (inGame && cell == MINE_CELL) {
-
-                    inGame = false;
-                }
-
-                if (!inGame) {
-                    if (cell == COVERED_MINE_CELL) {
-                        cell = DRAW_MINE;
-                    } else if (cell == FLAGGED_MINE_CELL || cell == FLAGGED_SUPER_BOMB) {
-                        cell = DRAW_FLAG;
-                    } else if (cell == COVERED_SUPER_BOMB_CELL) {
-                        cell = DRAW_SUPERBOMB;
-                        // } else if (cell == SUPER_BOMB_CELL) {
-                        // cell = DRAW_SUPERBOMB;
-                    } else if (cell == MINE_COL_LINE_OFSUPER) {
-                        cell = DRAW_MINE_SUPERBOMB_LINE_COL;
-                    } else if (cell > COVERED_MINE_CELL) {
-                        cell = DRAW_WRONG_FLAG;
-                    } else if (cell > MINE_CELL) {
-                        cell = DRAW_COVER;
-                    }
-                } else {
-
-                    if (cell == SUPER_BOMB_CELL) {
-                        cell = DRAW_SUPERBOMB;
-                    } else if (cell == FLAGGED_MINE_CELL) {
-                        cell = DRAW_FLAG;
-                    } else if (cell == FLAGGED_SUPER_BOMB) {
-                        cell = DRAW_FLAG_SUPERBOMB;
-                    } else if (cell == MINE_COL_LINE_OFSUPER) {
-                        cell = DRAW_MINE_SUPERBOMB_LINE_COL;
-                    } else if (cell > COVERED_MINE_CELL && cell != COVERED_SUPER_BOMB_CELL) {
-                        cell = DRAW_FLAG;
-                    } else if (cell > MINE_CELL) {
-                        cell = DRAW_COVER;
-                        uncover++;
-                    }
-                }
-
-                g.drawImage(img[cell], (j * CELL_SIZE),
-                        (i * CELL_SIZE), this);
+            if (cell == SUPER_BOMB_CELL) {
+                cell = DRAW_SUPERBOMB;
+            } else if (cell == FLAGGED_MINE_CELL) {
+                cell = DRAW_FLAG;
+            } else if (cell == FLAGGED_SUPER_BOMB) {
+                cell = DRAW_FLAG_SUPERBOMB;
+            } else if (cell == MINE_COL_LINE_OFSUPER) {
+                cell = DRAW_MINE_SUPERBOMB_LINE_COL;
+            } else if (cell > COVERED_MINE_CELL && cell != COVERED_SUPER_BOMB_CELL) {
+                cell = DRAW_FLAG;
+            } else if (cell > MINE_CELL) {
+                cell = DRAW_COVER;
+                uncoverCells++;
             }
         }
 
-        if (uncover == 0 && inGame) {
+        // if (uncover == 0 && inGame) {
 
-            inGame = false;
-            statusbar.setText("Game won");
+        // inGame = false;
+        // // statusbar.setText("Game won");
+        // return -1;
 
-        } else if (!inGame) {
-            statusbar.setText("Game lost");
+        // } else if (!inGame) {
+        // statusbar.setText("Game lost");
+        // return -2;
+        // }
+        // System.out.println("position after " + cell + "\n\n");
+
+        return cell;
+    }
+
+    public void mousePressed(int position, MouseEvent ee, Tile tile) {
+
+        int cCol = tile.columnTile;
+        int cRow = tile.rowTile;
+
+        int x = (int) ee.getX() + CELL_SIZE * cCol;
+        int y = (int) ee.getY() + CELL_SIZE + cRow;
+
+        System.out.println("x " + x + " y " + y + " CCol " + cCol + " Row " + cRow);
+
+        if ((x < N_COLS * CELL_SIZE) && (y < N_ROWS * CELL_SIZE)) {
+            // ! BUTTON3 == RIGHT
+            // THIS IS FOR FLAGS
+            if (ee.getButton() == MouseButton.SECONDARY) {
+                successfulClicks++;
+                if (field[(cRow * N_COLS) + cCol] > MINE_CELL
+                        && field[(cRow * N_COLS) + cCol] != MINE_COL_LINE_OFSUPER
+                        && field[(cRow * N_COLS) + cCol] != FLAGGED_SUPER_BOMB) {
+
+                    if (successfulClicks <= 4 && field[(cRow * N_COLS) + cCol] == COVERED_SUPER_BOMB_CELL
+                            && !flagSuperBomb) {
+                        flagSuperBomb = true;
+                        open_one_line_one_col((cRow * N_COLS) + cCol);
+                    }
+
+                    // open_one_line_one_col((cRow * N_COLS) + cCol);
+
+                    if ((field[(cRow * N_COLS) + cCol] <= COVERED_MINE_CELL
+                            || ((field[(cRow * N_COLS) + cCol] > SUPER_BOMB_CELL)
+                                    && field[(cRow * N_COLS) + cCol] <= COVERED_SUPER_BOMB_CELL))) {
+
+                        if (flags > 0) {
+                            field[(cRow * N_COLS) + cCol] += FOR_FLAG;
+                            flags--;
+                            String msg = Integer.toString(flags);
+                            statusbar.setText(msg);
+                        } else {
+                            statusbar.setText("No marks left");
+                        }
+                    } else {
+
+                        field[(cRow * N_COLS) + cCol] -= FOR_FLAG;
+                        flags++;
+                        String msg = Integer.toString(flags);
+                        statusbar.setText(msg);
+                    }
+                }
+            }
+            // NOT A FLAG
+            // * this if is for testing
+            else if (ee.getButton() == MouseButton.MIDDLE) {
+                // doRepaint = true;
+                flagSuperBomb = true;
+                System.out.print(flagSuperBomb);
+                field[(cRow * N_COLS) + cCol] -= COVER_FOR_CELL;
+                open_one_line_one_col((cRow * N_COLS) + cCol);
+                flagSuperBomb = false;
+                System.out.print(flagSuperBomb);
+            }
+            // NOT A FLAG
+            else {
+
+                if (field[(cRow * N_COLS) + cCol] > COVERED_MINE_CELL)
+                    return;
+
+                if ((field[(cRow * N_COLS) + cCol] > MINE_CELL
+                        && field[(cRow * N_COLS) + cCol] < FLAGGED_MINE_CELL)
+                        || (field[(cRow * N_COLS) + cCol] > SUPER_BOMB_CELL
+                                && field[(cRow * N_COLS) + cCol] < FLAGGED_SUPER_BOMB)) {
+
+                    field[(cRow * N_COLS) + cCol] -= COVER_FOR_CELL;
+                    // doRepaint = true;
+
+                    if (field[(cRow * N_COLS) + cCol] == MINE_CELL
+                            || field[(cRow * N_COLS) + cCol] == SUPER_BOMB_CELL) {
+                        inGame = false;
+                    }
+
+                    if (field[(cRow * N_COLS) + cCol] == EMPTY_CELL) {
+                        find_empty_cells((cRow * N_COLS) + cCol);
+                    }
+                }
+
+            }
+            uncoverCells = 0;
+            for (int j = 0; j < N_ROWS * N_COLS; j++) {
+                Tile newtile = new Tile(j, field[j]);
+                int as = returnImageNumber(newtile);
+                newtile.paintingTile(as);
+                boardPane.getChildren().add(newtile);
+            }
+
+            if (uncoverCells == 0 && flags == 0) {
+                Alert alert = new Alert(AlertType.CONFIRMATION, "END OF GAME   YOU WIN",
+                        ButtonType.YES,
+                        ButtonType.NO);
+                alert.showAndWait();
+
+                if (alert.getResult() == ButtonType.YES) {
+                    newGame();
+                }
+            }
+
+            if (!inGame) {
+                Alert alert = new Alert(AlertType.WARNING, "Yoy Lose🤨. Again  ?",
+                        ButtonType.YES,
+                        ButtonType.NO);
+                alert.showAndWait();
+
+                if (alert.getResult() == ButtonType.YES) {
+                    newGame();
+                    // repaint();
+                } else if (alert.getResult() == ButtonType.NO) {
+                    wholeStage.close();
+                }
+            }
         }
     }
 
-    private class MinesAdapter extends MouseAdapter {
+    private class Tile extends StackPane {
+        private int columnTile, rowTile, value, position;
 
-        @Override
-        public void mousePressed(MouseEvent e) {
+        private Rectangle border = new Rectangle(CELL_SIZE, CELL_SIZE);
+        private Text text = new Text();
 
-            int x = e.getX();
-            int y = e.getY();
-            int cCol = x / CELL_SIZE;
-            int cRow = y / CELL_SIZE;
+        public Tile(int position, int value) {
+            this.position = position;
+            columnTile = position % N_COLS;
+            rowTile = (position - columnTile) / N_ROWS;
+            this.value = value;
 
-            System.out.println("x " + x + " y " + y + " CCol " + cCol + " Row " + cRow);
-            boolean doRepaint = false;
+            border.setStroke(Color.LIGHTGRAY);
 
-            // auto einai gia thn ennallagh anamesa sta paixnidia
-            // tha prepei na to ftiaxo etsi oste na rotaei h na petaei ena munhma
+            border.setFill(new ImagePattern(img[10]));
+            text.setFont(Font.font(15));
+            text.setText(Integer.toString(value));
+            text.setVisible(false);
+            getChildren().addAll(border, text);
 
-            // String selection;
-            // if (!inGame) {
-            // Alert alert = new Alert(AlertType.CONFIRMATION, "Delete " + selection + " ?",
-            // ButtonType.YES,
-            // ButtonType.NO,
-            // ButtonType.CANCEL);
-            // alert.showAndWait();
+            setTranslateX(columnTile * CELL_SIZE);
+            setTranslateY(rowTile * CELL_SIZE);
 
-            // if (alert.getResult() == ButtonType.YES) {
-            // newGame();
-            // // repaint();
-            // }
-            // }
-            // ! TODO: NA SVISO TA PARAKATO
-            for (int j = 0; j < allCells; j++) {
-                System.out.print(j + " ");
-                if ((j + 1) % N_COLS == 0)
-                    System.out.print("\n");
-            }
-            System.out.print("\n");
-            for (int j = 0; j < allCells; j++) {
-                System.out.print(field[j] + " ");
-                if ((j + 1) % N_COLS == 0)
-                    System.out.print("\n");
-            }
-            System.out.print("\n");
+            setOnMouseClicked(e -> open(e, this.position));
+        }
 
-            if ((x < N_COLS * CELL_SIZE) && (y < N_ROWS * CELL_SIZE)) {
-                // ! BUTTON3 == RIGHT
-                // THIS IS FOR FLAGS
-                if (e.getButton() == MouseEvent.BUTTON3) {
-                    successfulClicks++;
-                    if (field[(cRow * N_COLS) + cCol] > MINE_CELL
-                            && field[(cRow * N_COLS) + cCol] != MINE_COL_LINE_OFSUPER
-                            && field[(cRow * N_COLS) + cCol] != FLAGGED_SUPER_BOMB) {
+        public void open(javafx.scene.input.MouseEvent ee, int position) {
+            mousePressed(position, ee, this);
+        }
 
-                        doRepaint = true;
-                        System.out.println("succesu " + successfulClicks + " field = " + field[(cRow
-                                * N_COLS) + cCol]
-                                + " flagSuper " + flagSuperBomb);
-                        if (successfulClicks <= 4 && field[(cRow * N_COLS) + cCol] == COVERED_SUPER_BOMB_CELL
-                                && !flagSuperBomb) {
-                            flagSuperBomb = true;
-                            open_one_line_one_col((cRow * N_COLS) + cCol);
-                        }
-
-                        if ((field[(cRow * N_COLS) + cCol] <= COVERED_MINE_CELL
-                                || ((field[(cRow * N_COLS) + cCol] > SUPER_BOMB_CELL)
-                                        && field[(cRow * N_COLS) + cCol] <= COVERED_SUPER_BOMB_CELL))) {
-
-                            if (flags > 0) {
-                                field[(cRow * N_COLS) + cCol] += FOR_FLAG;
-                                flags--;
-                                String msg = Integer.toString(flags);
-                                statusbar.setText(msg);
-                            } else {
-                                statusbar.setText("No marks left");
-                            }
-                        } else {
-
-                            field[(cRow * N_COLS) + cCol] -= FOR_FLAG;
-                            flags++;
-                            String msg = Integer.toString(flags);
-                            statusbar.setText(msg);
-                        }
-                    }
-                }
-                // NOT A FLAG
-                // * this if is for testing
-                else if (e.getButton() == MouseEvent.BUTTON2) {
-                    doRepaint = true;
-                    flagSuperBomb = true;
-                    System.out.print(flagSuperBomb);
-                    field[(cRow * N_COLS) + cCol] -= COVER_FOR_CELL;
-                    open_one_line_one_col((cRow * N_COLS) + cCol);
-                    flagSuperBomb = false;
-                    System.out.print(flagSuperBomb);
-                }
-                // NOT A FLAG
-                else {
-
-                    if (field[(cRow * N_COLS) + cCol] > COVERED_MINE_CELL)
-                        return;
-
-                    if ((field[(cRow * N_COLS) + cCol] > MINE_CELL
-                            && field[(cRow * N_COLS) + cCol] < FLAGGED_MINE_CELL)
-                            || (field[(cRow * N_COLS) + cCol] > SUPER_BOMB_CELL
-                                    && field[(cRow * N_COLS) + cCol] < FLAGGED_SUPER_BOMB)) {
-
-                        field[(cRow * N_COLS) + cCol] -= COVER_FOR_CELL;
-                        doRepaint = true;
-
-                        if (field[(cRow * N_COLS) + cCol] == MINE_CELL
-                                || field[(cRow * N_COLS) + cCol] == SUPER_BOMB_CELL) {
-                            inGame = false;
-                        }
-
-                        if (field[(cRow * N_COLS) + cCol] == EMPTY_CELL) {
-                            find_empty_cells((cRow * N_COLS) + cCol);
-                        }
-                    }
-                }
-
-                if (doRepaint) {
-                    repaint();
-                }
-            }
+        public void paintingTile(int numberImg) {
+            border.setFill(new ImagePattern(img[numberImg]));
         }
 
     }
