@@ -1,26 +1,20 @@
-//! https://zetcode.com/javagames/minesweeper/
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
-
-import javax.swing.JLabel;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.image.Image;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
 
@@ -49,12 +43,12 @@ public class Board {
     private final int DRAW_SUPERBOMB = 14;
     private final int DRAW_FLAG_SUPERBOMB = 15;
 
-    public final int N_MINES = 5;
-    public final int N_ROWS = 15;
-    public final int N_COLS = 15;
+    public int N_MINES;
+    public int N_ROWS;
+    public int N_COLS;
 
-    private final int BOARD_WIDTH = N_COLS * CELL_SIZE + 10;
-    private final int BOARD_HEIGHT = N_ROWS * CELL_SIZE + 10;
+    private int BOARD_WIDTH;
+    private int BOARD_HEIGHT;
 
     private int[] field;
     private boolean inGame;
@@ -64,17 +58,27 @@ public class Board {
 
     private int successfulClicks = 0;
 
-    private int allCells;
-    private String fileForMineTXT = "";
-    private final Label statusbar;
+    private int allCells = 0;
+    private String fileForMineTXT;
+    private final Label flagsStatubar;
+    private final Label minesStatusBar;
     private Stage wholeStage;
     private Pane boardPane;
     private int uncoverCells;
+    private GameTimer gameTimer;
 
-    public Board(Pane bPane, Label lableBottom, Stage stage) {
+    public Board(int difficulty, int numMines, Pane bPane, Label numberFlagsLabel, Label totalminesLabel, Stage stage,
+            GameTimer gameTimer) {
+
+        N_ROWS = (difficulty == 1) ? 9 : 16;
+        N_COLS = (difficulty == 1) ? 9 : 16;
+        N_MINES = numMines;
         boardPane = bPane;
-        statusbar = lableBottom;
+        flagsStatubar = numberFlagsLabel;
+        minesStatusBar = totalminesLabel;
         wholeStage = stage;
+        this.gameTimer = gameTimer;
+        System.out.print("mines1 " + difficulty);
         initBoard();
     }
 
@@ -87,13 +91,17 @@ public class Board {
     }
 
     private void initBoard() {
+        boardPane.setBorder(new Border(
+                new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        BOARD_WIDTH = N_COLS * CELL_SIZE;
+        BOARD_HEIGHT = N_COLS * CELL_SIZE;
         boardPane.setPrefSize(BOARD_WIDTH, BOARD_HEIGHT);
+        minesStatusBar.setText(Integer.toString(N_MINES));
         loadImages();
         newGame();
     }
 
     private void createMineTXT() {
-
         SimpleDateFormat sf = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss");
         Date date = new Date(System.currentTimeMillis());
         var datetimenow = sf.format(date);
@@ -102,13 +110,12 @@ public class Board {
             writer.write(fileForMineTXT);
             writer.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    private void newGame() {
-
+    public void newGame() {
+        fileForMineTXT = "";
         int cell;
 
         var random = new Random();
@@ -122,9 +129,10 @@ public class Board {
             field[i] = COVER_FOR_CELL;
         }
 
-        statusbar.setText(Integer.toString(flags));
+        flagsStatubar.setText(Integer.toString(flags));
 
         int i = 0;
+        System.out.print(" x2 " + N_ROWS + " x3 = " + N_COLS + " allcesls " + allCells);
         while (i < N_MINES) {
 
             int position = (int) (allCells * random.nextDouble());
@@ -187,13 +195,14 @@ public class Board {
             }
         }
         createMineTXT();
+        gameTimer.startTimer();
         for (int j = 0; j < allCells; j++) {
             Tile tile = new Tile(j, field[j], this);
             boardPane.getChildren().add(tile);
 
-            System.out.print(field[j] + " ");
-            if ((j + 1) % 15 == 0)
-                System.out.print("\n");
+            // System.out.print(field[j] + " ");
+            // if ((j + 1) % 15 == 0)
+            // System.out.print("\n");
         }
         System.out.print("\n");
 
@@ -370,8 +379,8 @@ public class Board {
                 cell = DRAW_FLAG;
             } else if (cell == COVERED_SUPER_BOMB_CELL) {
                 cell = DRAW_SUPERBOMB;
-                // } else if (cell == SUPER_BOMB_CELL) {
-                // cell = DRAW_SUPERBOMB;
+            } else if (cell == SUPER_BOMB_CELL) {
+                cell = DRAW_SUPERBOMB;
             } else if (cell == MINE_COL_LINE_OFSUPER) {
                 cell = DRAW_MINE_SUPERBOMB_LINE_COL;
             } else if (cell > COVERED_MINE_CELL) {
@@ -396,19 +405,6 @@ public class Board {
                 uncoverCells++;
             }
         }
-
-        // if (uncover == 0 && inGame) {
-
-        // inGame = false;
-        // // statusbar.setText("Game won");
-        // return -1;
-
-        // } else if (!inGame) {
-        // statusbar.setText("Game lost");
-        // return -2;
-        // }
-        // System.out.println("position after " + cell + "\n\n");
-
         return cell;
     }
 
@@ -419,8 +415,6 @@ public class Board {
 
         int x = (int) ee.getX() + CELL_SIZE * cCol;
         int y = (int) ee.getY() + CELL_SIZE + cRow;
-
-        System.out.println("x " + x + " y " + y + " CCol " + cCol + " Row " + cRow);
 
         if ((x < N_COLS * CELL_SIZE) && (y < N_ROWS * CELL_SIZE)) {
             // ! BUTTON3 == RIGHT
@@ -447,21 +441,21 @@ public class Board {
                             field[(cRow * N_COLS) + cCol] += FOR_FLAG;
                             flags--;
                             String msg = Integer.toString(flags);
-                            statusbar.setText(msg);
+                            flagsStatubar.setText(msg);
                         } else {
-                            statusbar.setText("No marks left");
+                            flagsStatubar.setText("No marks left");
                         }
                     } else {
 
                         field[(cRow * N_COLS) + cCol] -= FOR_FLAG;
                         flags++;
                         String msg = Integer.toString(flags);
-                        statusbar.setText(msg);
+                        flagsStatubar.setText(msg);
                     }
                 }
             }
             // NOT A FLAG
-            // * this if is for testing
+            // * this if is for testing DELETE IT
             else if (ee.getButton() == MouseButton.MIDDLE) {
                 // doRepaint = true;
                 flagSuperBomb = true;
@@ -474,8 +468,8 @@ public class Board {
             // NOT A FLAG
             else {
 
-                if (field[(cRow * N_COLS) + cCol] > COVERED_MINE_CELL)
-                    return;
+                // if (field[(cRow * N_COLS) + cCol] > COVERED_MINE_CELL)
+                // return;
 
                 if ((field[(cRow * N_COLS) + cCol] > MINE_CELL
                         && field[(cRow * N_COLS) + cCol] < FLAGGED_MINE_CELL)
@@ -505,30 +499,48 @@ public class Board {
             }
 
             if (uncoverCells == 0 && flags == 0) {
-                Alert alert = new Alert(AlertType.CONFIRMATION, "END OF GAME   YOU WIN",
-                        ButtonType.YES,
-                        ButtonType.NO);
-                alert.showAndWait();
-
-                if (alert.getResult() == ButtonType.YES) {
-                    newGame();
-                }
+                endGameWin();
             }
 
             if (!inGame) {
-                Alert alert = new Alert(AlertType.WARNING, "Yoy Lose :( . Again  ?",
-                        ButtonType.YES,
-                        ButtonType.NO);
-                alert.showAndWait();
-
-                if (alert.getResult() == ButtonType.YES) {
-                    newGame();
-                    // repaint();
-                } else if (alert.getResult() == ButtonType.NO) {
-                    wholeStage.close();
-                }
+                endGameLost();
             }
         }
     }
 
+    public void endGameLost() {
+        gameTimer.endTimer();
+        Alert alert = new Alert(AlertType.WARNING, "You Lose :(  \nAgain  ?",
+                ButtonType.YES,
+                ButtonType.NO);
+        alert.showAndWait();
+
+        if (alert.getResult() == ButtonType.YES) {
+            newGame();
+            // repaint();
+        } else if (alert.getResult() == ButtonType.NO) {
+            wholeStage.close();
+        }
+    }
+
+    public void endGameWin() {
+        gameTimer.endTimer();
+        Alert alert = new Alert(AlertType.CONFIRMATION, "END OF GAME\nYOU WIN",
+                ButtonType.YES,
+                ButtonType.NO);
+        alert.showAndWait();
+        if (alert.getResult() == ButtonType.YES) {
+            newGame();
+        }
+    }
+
+    public void solutionGameEndRevealAll() {
+        inGame = false;
+        for (int j = 0; j < N_ROWS * N_COLS; j++) {
+            Tile newtile = new Tile(j, field[j], this);
+            int as = returnImageNumber(newtile);
+            newtile.paintingTile(as);
+            boardPane.getChildren().add(newtile);
+        }
+    }
 }
