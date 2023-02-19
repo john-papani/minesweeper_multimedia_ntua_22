@@ -44,8 +44,6 @@ To run the game, simply compile and run the Minesweeper.java file.
   <img src="./gui_photos/gui_3.png" width="350" height="450" alt="accessibility text">
   <img src="./gui_photos/gui_4.png" width="350" height="450" alt="accessibility text">
 </p>
----
-
 <br> 
  <details><summary> Folder Structure</summary>
 <p>
