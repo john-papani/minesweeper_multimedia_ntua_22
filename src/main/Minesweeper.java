@@ -1,3 +1,8 @@
+package main;
+// !!! FAINETAI SAN NA MHN KANEI CLEAN 
+
+// !!! OTAN APO 16x16, PAEI STO 9x9
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -43,6 +48,7 @@ class InvalidValueException extends Exception {
 }
 
 public class Minesweeper extends Application {
+
     public static int scenarioID;
     public static int difficulty;
     public static int numMines;
@@ -59,7 +65,7 @@ public class Minesweeper extends Application {
     private static int MAX_MINES_HARD = 45;
 
     private GameTimer gameTimer;
-    private Scene scene;
+    public Scene scene;
     private Scene scenePopUp;
     private GridPane topPane;
     private MenuBar mb;
@@ -77,7 +83,7 @@ public class Minesweeper extends Application {
         topPane = new GridPane();
         VBox vBoxMenu = createMenuBar(stage);
         HBox hBoxTop = createUpPanel();
-        vBoxMenu.prefWidthProperty().bind(rootPane.widthProperty());
+        vBoxMenu.prefWidthProperty().bind(pane1.widthProperty());
 
         topPane.add(vBoxMenu, 0, 0);
         topPane.add(hBoxTop, 0, 1);
@@ -97,19 +103,19 @@ public class Minesweeper extends Application {
         Menu menu1 = new Menu("Application");
         // create menuitems
         MenuItem menu1Item1 = new MenuItem("Create");
-        MenuItem menu1Item2 = new MenuItem("Load");
-        MenuItem menu1Item3 = new MenuItem("Start");
+        MenuItem menu1Item2 = new MenuItem("Load/Start");
+        // MenuItem menu1Item3 = new MenuItem("Start");
         MenuItem menu1Item4 = new MenuItem("Exit");
         // add menu items to menu1
 
         menu1Item1.setOnAction(e -> openCreatePopUpScenario(stage));
         menu1Item2.setOnAction(e -> loadPopUpScenario(stage));
-        menu1Item3.setOnAction(e -> startGameCreatePane_MenuItem(stage));
+        // menu1Item3.setOnAction(e -> startGameCreatePane_MenuItem(stage));
         menu1Item4.setOnAction(e -> exitFromMenuItem(stage));
 
         menu1.getItems().add(menu1Item1);
         menu1.getItems().add(menu1Item2);
-        menu1.getItems().add(menu1Item3);
+        // menu1.getItems().add(menu1Item3);
         menu1.getItems().add(menu1Item4);
 
         Menu menu2 = new Menu("Details");
@@ -167,7 +173,7 @@ public class Minesweeper extends Application {
         if (gameTimer != null && board != null) {
             gameTimer.endTimer();
             board.solutionGameEndRevealAll();
-            Alert alert = new Alert(AlertType.WARNING, "You Lose :( \nAgain  ?",
+            Alert alert = new Alert(AlertType.WARNING, "You Lose. \nAgain  ?",
                     ButtonType.YES,
                     ButtonType.NO);
             alert.showAndWait();
@@ -216,7 +222,7 @@ public class Minesweeper extends Application {
         Integer[] varIntegers = { difficulty, numMines, max_time, hasSuperMine };
         try {
             reader = new BufferedReader(new FileReader(
-                    "./src/scenarios-folder/SCENARIO-" + id + ".txt"));
+                    "./src/medialab/SCENARIO-" + id + ".txt"));
             int reader_len = 0;
             String line = reader.readLine();
 
@@ -268,6 +274,7 @@ public class Minesweeper extends Application {
             alert.showAndWait();
             stage.close();
         }
+        System.out.println("readfilescenario " + numMines);
     }
 
     public GridPane createPopUpNewScenario(Stage stage) {
@@ -336,7 +343,7 @@ public class Minesweeper extends Application {
         String newScenario = String.format("%d\n%d\n%d\n%d", difficultyValue, Integer.parseInt(numMines), time,
                 superBombValue);
         try (BufferedWriter writer = new BufferedWriter(
-                new FileWriter("./src/scenarios-folder/SCENARIO-" + scenarioID + ".txt", true))) {
+                new FileWriter("./src/medialab/SCENARIO-" + scenarioID + ".txt", true))) {
             writer.write(newScenario);
             writer.close();
         } catch (IOException e) {
@@ -365,6 +372,12 @@ public class Minesweeper extends Application {
         goBackButton.setOnAction(e -> stage.setScene(scene));
         saveNewScenarioButton.setOnAction(e -> {
             try {
+                // if scenario id is wrong (not number) the program will exit!
+                if (scenarioIdTextField.getText() == null | scenarioIdTextField.getText().equals("")) {
+                    Alert alert = new Alert(AlertType.WARNING, "Choose a valid Scenario Id next time",
+                            ButtonType.OK);
+                    alert.showAndWait();
+                }
                 readScenarioFile(Integer.parseInt(scenarioIdTextField.getText()), stage);
             } catch (Exception e1) {
                 e1.printStackTrace();
@@ -375,9 +388,9 @@ public class Minesweeper extends Application {
                     totalminesLabel, stage, gameTimer);
             gameTimer.addBoardToTimer(board);
             stage.setScene(scene);
+            System.out.println("loadnewscenario " + numMines);
         });
         return popupGridPane;
-
     }
 
     public static void main(String[] args) throws Exception {
@@ -386,10 +399,13 @@ public class Minesweeper extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        // Minesweeper a = new Minesweeper();
         scene = new Scene(Minesweeper1(stage));
-        stage.setTitle("My Minesweeper_ioannis-papani_multimedia_2022");
+        // stage.setTitle("Minesweeper_ioannis-papani_multimedia_2022");
+        stage.setTitle("MediaLab Minesweeper");
         stage.setScene(scene);
         // stage.setResizable(false);
         stage.show();
     }
+
 }

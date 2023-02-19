@@ -1,3 +1,4 @@
+package main;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -69,7 +70,6 @@ public class Board {
 
     public Board(int difficulty, int numMines, Pane bPane, Label numberFlagsLabel, Label totalminesLabel, Stage stage,
             GameTimer gameTimer) {
-
         N_ROWS = (difficulty == 1) ? 9 : 16;
         N_COLS = (difficulty == 1) ? 9 : 16;
         N_MINES = numMines;
@@ -106,7 +106,7 @@ public class Board {
         Date date = new Date(System.currentTimeMillis());
         var datetimenow = sf.format(date);
         try (BufferedWriter writer = new BufferedWriter(
-                new FileWriter("./" + "mines" + datetimenow + ".txt", true))) {
+                new FileWriter("./src/mines/" + "mines" + datetimenow + ".txt", true))) {
             writer.write(fileForMineTXT);
             writer.close();
         } catch (IOException e) {
@@ -117,6 +117,7 @@ public class Board {
     public void newGame() {
         fileForMineTXT = "";
         int cell;
+        System.out.println("1212");
 
         var random = new Random();
         inGame = true;

@@ -1,3 +1,4 @@
+package main;
 import java.util.TimerTask;
 
 import javafx.application.Platform;
@@ -6,6 +7,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
+// import main.Board;
 
 import java.util.Timer;
 
@@ -34,6 +36,10 @@ public class GameTimer {
         t.schedule(new rt(), 0, 1000);
     }
 
+    
+    /** 
+     * @param seconds
+     */
     public void startTimerWithSeconds(int seconds) {
         this.seconds = seconds;
         this.t = new Timer();
@@ -44,6 +50,10 @@ public class GameTimer {
         t.cancel();
     }
 
+    
+    /** 
+     * @param board
+     */
     public void addBoardToTimer(Board board) {
         this.board = board;
     }
@@ -84,6 +94,29 @@ public class GameTimer {
             }
         }
 
+    }
+    
+    /** 
+     * @return int
+     */
+    public int GameTimerGetSeconds() {
+        return this.seconds;
+    }
+
+    
+    /** 
+     * @return Label
+     */
+    public Label GameTimerGetLabel() {
+        return this.timeTextTop;
+    }
+
+    
+    /** 
+     * @return Stage
+     */
+    public Stage GameTimerGetStage() {
+        return this.stage;
     }
 
 }

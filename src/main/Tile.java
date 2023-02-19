@@ -1,9 +1,11 @@
+package main;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import main.Board;
 
 public class Tile extends StackPane {
     public Board boardD;
