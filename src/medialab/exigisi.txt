@@ -1,3 +1,0 @@
-SCENARIο 1,2 ΟΚ
-3 == invalid_description_example
-4 == invalid_range_example
