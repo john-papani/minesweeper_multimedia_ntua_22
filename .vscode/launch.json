@@ -11,36 +11,6 @@
             "vmArgs": "--module-path C:/Users/johnp/Downloads/openjfx-19_windows-x64_bin-sdk/javafx-sdk-19/lib --add-modules javafx.controls,javafx.fxml",
             "mainClass": "main.Minesweeper",
             "projectName": "Minesweeper_multimedia_2022_514f7160"
-        },
-        {
-            "type": "java",
-            "name": "Launch A",
-            "request": "launch",
-            "vmArgs": "--module-path C:/Users/johnp/Downloads/openjfx-19_windows-x64_bin-sdk/javafx-sdk-19/lib --add-modules javafx.controls,javafx.fxml",
-            "mainClass": "A",
-            "projectName": "Minesweeper_multimedia_2022_514f7160"
-        },
-        {
-            "type": "java",
-            "name": "Launch MinesweeperApp",
-            "request": "launch",
-            "mainClass": "MinesweeperApp",
-            "vmArgs": "--module-path C:/Users/johnp/Downloads/openjfx-19_windows-x64_bin-sdk/javafx-sdk-19/lib --add-modules javafx.controls,javafx.fxml",
-            "projectName": "Minesweeper_multimedia_2022_514f7160"
-        },
-        {
-            "type": "java",
-            "name": "Launch Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "Launch Minesweeper",
-            "request": "launch",
-            "vmArgs": "--module-path C:/Users/johnp/Downloads/openjfx-19_windows-x64_bin-sdk/javafx-sdk-19/lib --add-modules javafx.controls,javafx.fxml",
-            "mainClass": "main.Minesweeper",
-            "projectName": "Minesweeper_multimedia_2022_514f7160"
         }
     ]
 }
