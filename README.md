@@ -2,7 +2,7 @@
 
 <p style="text-align: center;">
 <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/john-papani/minesweeper_multimedia_ntua_22">
-<img alt="GitHub file size in bytes" src="https://img.shields.io/github/size/john-papani/minesweeper_multimedia_ntua_22">
+<img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/john-papani/minesweeper_multimedia_ntua_22">
 <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/john-papani/minesweeper_multimedia_ntua_22">
 </p>
 This repository hosts the semester project of the Multimedia Technology course held by ECE NTUA during the Winter 2022-2023.
