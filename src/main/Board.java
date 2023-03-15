@@ -1,4 +1,5 @@
 package main;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -78,7 +79,7 @@ public class Board {
         minesStatusBar = totalminesLabel;
         wholeStage = stage;
         this.gameTimer = gameTimer;
-        System.out.print("mines1 " + difficulty);
+        System.out.println("difficulty " + difficulty);
         initBoard();
     }
 
@@ -117,8 +118,6 @@ public class Board {
     public void newGame() {
         fileForMineTXT = "";
         int cell;
-        System.out.println("1212");
-
         var random = new Random();
         inGame = true;
         flags = N_MINES;
@@ -133,7 +132,7 @@ public class Board {
         flagsStatubar.setText(Integer.toString(flags));
 
         int i = 0;
-        System.out.print(" x2 " + N_ROWS + " x3 = " + N_COLS + " allcesls " + allCells);
+        System.out.print("n_rows: " + N_ROWS + ", n_cols: " + N_COLS + ", #allcells " + allCells);
         while (i < N_MINES) {
 
             int position = (int) (allCells * random.nextDouble());
@@ -200,10 +199,6 @@ public class Board {
         for (int j = 0; j < allCells; j++) {
             Tile tile = new Tile(j, field[j], this);
             boardPane.getChildren().add(tile);
-
-            // System.out.print(field[j] + " ");
-            // if ((j + 1) % 15 == 0)
-            // System.out.print("\n");
         }
         System.out.print("\n");
 
@@ -418,10 +413,10 @@ public class Board {
         int y = (int) ee.getY() + CELL_SIZE + cRow;
 
         if ((x < N_COLS * CELL_SIZE) && (y < N_ROWS * CELL_SIZE)) {
+            successfulClicks++;
             // ! BUTTON3 == RIGHT
             // THIS IS FOR FLAGS
             if (ee.getButton() == MouseButton.SECONDARY) {
-                successfulClicks++;
                 if (field[(cRow * N_COLS) + cCol] > MINE_CELL
                         && field[(cRow * N_COLS) + cCol] != MINE_COL_LINE_OFSUPER
                         && field[(cRow * N_COLS) + cCol] != FLAGGED_SUPER_BOMB) {
@@ -431,13 +426,9 @@ public class Board {
                         flagSuperBomb = true;
                         open_one_line_one_col((cRow * N_COLS) + cCol);
                     }
-
-                    // open_one_line_one_col((cRow * N_COLS) + cCol);
-
                     if ((field[(cRow * N_COLS) + cCol] <= COVERED_MINE_CELL
                             || ((field[(cRow * N_COLS) + cCol] > SUPER_BOMB_CELL)
                                     && field[(cRow * N_COLS) + cCol] <= COVERED_SUPER_BOMB_CELL))) {
-
                         if (flags > 0) {
                             field[(cRow * N_COLS) + cCol] += FOR_FLAG;
                             flags--;
@@ -456,21 +447,7 @@ public class Board {
                 }
             }
             // NOT A FLAG
-            // * this if is for testing DELETE IT
-            else if (ee.getButton() == MouseButton.MIDDLE) {
-                // doRepaint = true;
-                flagSuperBomb = true;
-                System.out.print(flagSuperBomb);
-                field[(cRow * N_COLS) + cCol] -= COVER_FOR_CELL;
-                open_one_line_one_col((cRow * N_COLS) + cCol);
-                flagSuperBomb = false;
-                System.out.print(flagSuperBomb);
-            }
-            // NOT A FLAG
             else {
-
-                // if (field[(cRow * N_COLS) + cCol] > COVERED_MINE_CELL)
-                // return;
 
                 if ((field[(cRow * N_COLS) + cCol] > MINE_CELL
                         && field[(cRow * N_COLS) + cCol] < FLAGGED_MINE_CELL)
@@ -478,13 +455,10 @@ public class Board {
                                 && field[(cRow * N_COLS) + cCol] < FLAGGED_SUPER_BOMB)) {
 
                     field[(cRow * N_COLS) + cCol] -= COVER_FOR_CELL;
-                    // doRepaint = true;
-
                     if (field[(cRow * N_COLS) + cCol] == MINE_CELL
                             || field[(cRow * N_COLS) + cCol] == SUPER_BOMB_CELL) {
                         inGame = false;
                     }
-
                     if (field[(cRow * N_COLS) + cCol] == EMPTY_CELL) {
                         find_empty_cells((cRow * N_COLS) + cCol);
                     }
@@ -498,11 +472,9 @@ public class Board {
                 newtile.paintingTile(as);
                 boardPane.getChildren().add(newtile);
             }
-
             if (uncoverCells == 0 && flags == 0) {
                 endGameWin();
             }
-
             if (!inGame) {
                 endGameLost();
             }
@@ -518,7 +490,6 @@ public class Board {
 
         if (alert.getResult() == ButtonType.YES) {
             newGame();
-            // repaint();
         } else if (alert.getResult() == ButtonType.NO) {
             wholeStage.close();
         }

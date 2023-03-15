@@ -1,7 +1,4 @@
 package main;
-// !!! FAINETAI SAN NA MHN KANEI CLEAN 
-
-// !!! OTAN APO 16x16, PAEI STO 9x9
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -88,11 +85,8 @@ public class Minesweeper extends Application {
         topPane.add(vBoxMenu, 0, 0);
         topPane.add(hBoxTop, 0, 1);
 
-        // gameTimer = new GameTimer(8, remainingTimeLabel, board, stage);
-        // aZuregiapanta.gr
         rootPane.setTop(topPane);
         rootPane.setBottom(pane1);
-        // timeTextTop.setText("03:00");
         return rootPane;
     }
 
@@ -110,7 +104,6 @@ public class Minesweeper extends Application {
 
         menu1Item1.setOnAction(e -> openCreatePopUpScenario(stage));
         menu1Item2.setOnAction(e -> loadPopUpScenario(stage));
-        // menu1Item3.setOnAction(e -> startGameCreatePane_MenuItem(stage));
         menu1Item4.setOnAction(e -> exitFromMenuItem(stage));
 
         menu1.getItems().add(menu1Item1);
@@ -150,11 +143,6 @@ public class Minesweeper extends Application {
         scenePopUp = new Scene(loadNewScenario(stage));
         stage.setScene(scenePopUp);
         stage.show();
-    }
-
-    public void startGameCreatePane_MenuItem(Stage stage) {
-        // with start will start the timer
-
     }
 
     public void exitFromMenuItem(Stage stage) {
@@ -274,7 +262,6 @@ public class Minesweeper extends Application {
             alert.showAndWait();
             stage.close();
         }
-        System.out.println("readfilescenario " + numMines);
     }
 
     public GridPane createPopUpNewScenario(Stage stage) {
@@ -383,12 +370,12 @@ public class Minesweeper extends Application {
                 e1.printStackTrace();
                 stage.close();
             }
-            gameTimer = new GameTimer(max_time + 1, remainingTimeLabel, stage); // +1 DELETE IT (MAYBE)
+            gameTimer = new GameTimer(max_time + 1, remainingTimeLabel, stage);
             board = new Board(difficulty, numMines, pane1, flagsLabel,
                     totalminesLabel, stage, gameTimer);
             gameTimer.addBoardToTimer(board);
             stage.setScene(scene);
-            System.out.println("loadnewscenario " + numMines);
+            System.out.println("numMines " + numMines);
         });
         return popupGridPane;
     }
@@ -399,12 +386,10 @@ public class Minesweeper extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        // Minesweeper a = new Minesweeper();
         scene = new Scene(Minesweeper1(stage));
-        // stage.setTitle("Minesweeper_ioannis-papani_multimedia_2022");
         stage.setTitle("MediaLab Minesweeper");
         stage.setScene(scene);
-        // stage.setResizable(false);
+        stage.setResizable(false);
         stage.show();
     }
 
